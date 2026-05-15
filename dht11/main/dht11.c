@@ -7,7 +7,7 @@
 #include "esp_log.h"
 #include "driver/gpio.h"
 #include "esp_system.h"
-#include "esp32/rom/ets_sys.h"
+#include "rom/ets_sys.h"
 
 #define TAG		"DHT11"
 

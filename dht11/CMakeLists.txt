@@ -6,3 +6,4 @@ cmake_minimum_required(VERSION 3.16)
 
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 project(dht11)
+set(COMPONENTS_REQUIRES esp_lcd driver)

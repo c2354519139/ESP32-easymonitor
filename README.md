@@ -29,7 +29,7 @@
 	button		————按键操作例程
 	ble_basic	————BLE的基础模板例程
 	ble_env		————通过BLE读取温湿度数据显示在小程序上
-	dht11		————DHT11温湿度传感器数据读取
+	ESP32-easymonitor		————DHT11温湿度传感器数据读取
 	display		————LVGL移植和st7789LCD驱动芯片代码
 	helloworld	————基础程序，打印helloworld
 	ledc		————简单的点灯程序和呼吸灯程序

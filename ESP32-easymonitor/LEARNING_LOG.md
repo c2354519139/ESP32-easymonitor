@@ -153,3 +153,66 @@ CONFIG_SPIRAM_IGNORE_NOTFOUND=y      # 没检测到 PSRAM 也不报错
 - **配置生效条件**：改 PSRAM 相关 config 必须 fullclean，否则旧 build 里的链接脚本不会更新。
 
 ---
+
+## 2026-05-16
+
+### Q8: 如何用终端命令上传代码到 GitHub/Gitee（避开敏感文件）
+
+**背景**：代码写完了，需要推到远程仓库。项目有两个 remote：`github`（GitHub）和 `origin`（Gitee）。敏感文件 `main/secrets.h` 已在 `.gitignore` 中排除。
+
+**完整流程**（假设代码已写好）：
+
+```bash
+# 1. 查看状态，确认哪些文件被修改/新增
+git status
+
+# 2. 查看具体改动（确认没有敏感信息）
+git diff
+
+# 3. 添加要提交的文件（⚠️ 用具体文件名，别用 git add -A 或 git add .）
+git add main/main.c main/lv_port.c main/lv_port.h ...
+
+# 4. 再次确认暂存区没有敏感文件
+git diff --cached --name-only
+
+# 5. 提交
+git commit -m "增加了LVGL库作为显示"
+
+# 6. 推送到远程仓库
+git push github main        # 推到 GitHub
+git push origin main        # 推到 Gitee（如果有）
+```
+
+**检查敏感文件是否被忽略**：
+```bash
+git status --ignored -s          # 列出所有被忽略的文件
+git check-ignore main/secrets.h   # 检查某个文件是否被 gitignore 覆盖
+git ls-files --others --exclude-standard  # 列出未跟踪且未被忽略的文件
+```
+
+**如果提交了不该提交的文件，如何撤销**：
+```bash
+git reset --soft HEAD~1    # 撤销最近一次 commit，改动回到暂存区
+git reset HEAD main/secrets.h  # 从暂存区移除某文件
+git commit -m "新消息"       # 重新提交
+```
+
+**常用命令速查**：
+| 命令 | 作用 |
+|------|------|
+| `git status` | 查看工作区状态 |
+| `git diff` | 查看未暂存的改动 |
+| `git diff --cached` | 查看已暂存的改动 |
+| `git log --oneline -5` | 最近 5 条提交记录 |
+| `git push <remote> <branch>` | 推送到指定远程仓库 |
+| `git branch -vv` | 查看本地分支与远程的跟踪关系 |
+| `git remote -v` | 查看所有远程仓库地址 |
+
+### 学习建议
+
+- **永远不要 `git add -A` 或 `git add .`**：这会无差别暂存所有文件，容易把忘记放进 `.gitignore` 的敏感文件（WiFi 密码、API key）一起提交。养成分文件 `git add <file>` 的习惯。
+- **提交前必看 diff**：`git diff --cached` 看一眼自己到底要提交什么，等于代码 review 的最后一关。很多意外提交（临时调试代码、硬编码的密码）都能在这一步拦截。
+- **.gitignore 在子目录也生效**：项目根目录的 `.gitignore` 可以匹配任意深度的路径，比如 `secrets.h` 会同时忽略 `main/secrets.h` 和 `components/xxx/secrets.h`。
+- **理解 remote 概念**：`git push <remote> <branch>` 中的 remote 是远程仓库的别名（不是 URL）。用 `git remote -v` 查看。你当前有两个 remote：`github` 指向 GitHub，`origin` 指向 Gitee。推哪个取决于你要同步到哪里。
+
+---

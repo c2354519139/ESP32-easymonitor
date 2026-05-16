@@ -72,6 +72,9 @@ void st7735s_show_chinese(uint16_t x, uint16_t y, uint8_t num,
 
 void st7735s_set_backlight(bool enable);
 
+/** LVGL 刷新接口: 将像素数据写入指定区域 (x2,y2 为不包含边界) */
+void st7735s_flush(int x1, int x2, int y1, int y2, void *data);
+
 #ifdef __cplusplus
 }
 #endif

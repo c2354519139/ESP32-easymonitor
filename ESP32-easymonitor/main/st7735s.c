@@ -235,7 +235,7 @@ esp_err_t st7735s_init(st7735s_rotate_t rotate)
 
     st7735s_send_cmd(0x36);      // MADCTL: 显示方向
     switch (rotate) {
-    case ST7735S_ROTATE_0:   st7735s_send_data_byte(0x40); break;  // MX=1 翻转左右
+    case ST7735S_ROTATE_0:   st7735s_send_data_byte(0x40); break;  // MX=1
     case ST7735S_ROTATE_90:  st7735s_send_data_byte(0x60); break;
     case ST7735S_ROTATE_180: st7735s_send_data_byte(0xC0); break;
     case ST7735S_ROTATE_270: st7735s_send_data_byte(0xA0); break;
@@ -456,6 +456,23 @@ void st7735s_show_chinese(uint16_t x, uint16_t y, uint8_t num,
         }
     }
     st7735s_send_data_burst(buf, 512, false);
+}
+
+// ==================== LVGL 刷新接口 ====================
+
+/*
+ * 面板 y=0 在底部，LVGL y=0 在顶部，逐行翻转发送。
+ */
+void st7735s_flush(int x1, int x2, int y1, int y2, void *data)
+{
+    int row_bytes = (x2 - x1) * 2;
+    const uint8_t *p = (const uint8_t *)data;
+    for (int lvgl_y = y1; lvgl_y < y2; lvgl_y++) {
+        int phys_y = 159 - lvgl_y;
+        st7735s_set_window(x1, phys_y, x2 - 1, phys_y);
+        st7735s_send_data_burst(p, row_bytes, false);
+        p += row_bytes;
+    }
 }
 
 // ==================== 背光控制 ====================
